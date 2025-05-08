@@ -9,9 +9,28 @@ import SwiftUI
 
 @main
 struct GitBarApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
+	@StateObject private var model = CommitInfoModel()
+	
+	var body: some Scene {
+		MenuBarExtra {
+			VStack {
+				ContentView()
+					.environmentObject(model)
+			
+				Button("Open settings") {
+					SettingsManager.open()
+				}
+				
+				Button("Quit GitBar") {
+					NSApplication.shared.terminate(nil)
+				}
+			}
+			.padding(.vertical, 5)
+		} label: {
+			HStack {
+				Text("\(model.commitCount) commits")
+				Label("GitBar", systemImage: "circle")
+			}
+		}
+	}
 }

@@ -8,17 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
+	@EnvironmentObject var model: CommitInfoModel
+
+	var body: some View {
+		VStack {
+			Text("Shared Property: \(model.commitCount)")
+			Button("Update Property") {
+				model.commitCount = model.commitCount + 2
+			}
+			
+		}
+		.padding()
+	}
 }
 
-#Preview {
-    ContentView()
-}
