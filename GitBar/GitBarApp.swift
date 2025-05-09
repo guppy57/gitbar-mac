@@ -9,13 +9,13 @@ import SwiftUI
 
 @main
 struct GitBarApp: App {
-	@StateObject private var model = CommitInfoModel()
+	@StateObject private var commitFetcherService = CommitFetcherService()
 	
 	var body: some Scene {
 		MenuBarExtra {
 			VStack {
 				ContentView()
-					.environmentObject(model)
+					.environmentObject(commitFetcherService)
 			
 				Button("Open settings") {
 					SettingsManager.open()
@@ -27,10 +27,23 @@ struct GitBarApp: App {
 			}
 			.padding(.vertical, 5)
 		} label: {
-			HStack {
-				Text("\(model.commitCount) commits")
-				Label("GitBar", systemImage: "circle")
-			}
+			MenuBarLabel(commitCount: commitFetcherService.commitFetcher.commitCount)
+				.environmentObject(commitFetcherService)
+				.onAppear() {
+					commitFetcherService.startMonitoring()
+				}
+		}
+	}
+}
+
+struct MenuBarLabel: View {
+	var commitCount: Int
+	
+	var body: some View {
+		HStack(spacing: 4) {
+			Text("\(commitCount)")
+				.monospacedDigit()
+			Image(systemName: "swift")
 		}
 	}
 }

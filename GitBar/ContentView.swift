@@ -6,22 +6,16 @@
 //
 
 import SwiftUI
+import Defaults
 
 struct ContentView: View {
-	@EnvironmentObject var model: CommitInfoModel
-	@StateObject var commitFetcher = CommitFetcher()
+	@EnvironmentObject var commitFetcherService: CommitFetcherService
 
 	var body: some View {
 		VStack {
-			Text("Count: \(commitFetcher.commitCount)")
-			Button("Update Property") {
-				commitFetcher.fetchCommits()
-			}
+			Text("Count: \(commitFetcherService.commitFetcher.commitCount)")
 		}
 		.padding()
-		.onAppear() {
-			commitFetcher.fetchCommits()
-		}
 	}
 }
 
