@@ -9,6 +9,7 @@ import SwiftUI
 
 @main
 struct GitBarApp: App {
+	@NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 	@StateObject private var commitFetcherService = CommitFetcherService()
 	
 	var body: some Scene {
