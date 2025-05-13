@@ -25,7 +25,11 @@ struct GitHubUser: Codable {
 }
 
 struct ContributionsCollection: Codable {
-	let totalCommitContributions: Int
+	let contributionCalendar: ContributionCalendar
+}
+
+struct ContributionCalendar: Codable {
+	let totalContributions: Int
 }
 
 class CommitFetcher: ObservableObject {
@@ -45,7 +49,7 @@ class CommitFetcher: ObservableObject {
 		do {
 			let decoder = JSONDecoder()
 			let response = try decoder.decode(GitHubResponse.self, from: jsonData)
-			return response.data.user.contributionsCollection.totalCommitContributions
+			return response.data.user.contributionsCollection.contributionCalendar.totalContributions
 		} catch {
 			print("Error decoding JSON: \(error)")
 			return nil
@@ -55,10 +59,10 @@ class CommitFetcher: ObservableObject {
 	func fetchCommits() {
 		self.isLoading = true
 		
-		let yesterday: Date = {
-			return Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+		let fromDate: Date = {
+			return Calendar.current.date(byAdding: .day, value: -1 * Int(Defaults[.rollingFetchDays]), to: Date()) ?? Date()
 		}()
-		let fromISO = ISO8601DateFormatter().string(from: yesterday)
+		let fromISO = ISO8601DateFormatter().string(from: fromDate)
 		let toISO = ISO8601DateFormatter().string(from: Date())
 		
 		guard let url = URL(string: "https://api.github.com/graphql") else {
@@ -70,17 +74,21 @@ class CommitFetcher: ObservableObject {
 		var request = URLRequest(url: url)
 		request.httpMethod = "POST"
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-		request.addValue("Bearer \(Defaults[.githubToken])", forHTTPHeaderField: "Authorization")
+		request.addValue("bearer \(Defaults[.githubToken])", forHTTPHeaderField: "Authorization")
 
 		let queryWithParams = """
 			query {
 				user(login: "\(Defaults[.githubUsername])") {
 				contributionsCollection(from: "\(fromISO)", to: "\(toISO)") {
-				  totalCommitContributions
+				  contributionCalendar {
+				    totalContributions
+				  }
 				}
 			  }
 			}
 		"""
+		
+		print(queryWithParams)
 		
 		do {
 			let body = GraphQLPayload(query: queryWithParams)
@@ -105,6 +113,7 @@ class CommitFetcher: ObservableObject {
 					
 					if let data = data {
 						if let responseString = String(data: data, encoding: .utf8) {
+							print(responseString)
 							let parsedTotalCommits = self.parseGitHubRespose(jsonString: responseString)
 							
 							if (parsedTotalCommits == nil) {
