@@ -37,7 +37,7 @@ class CommitFetcherService: ObservableObject {
 		
 		refreshData()
 		
-		timer = Timer.publish(every: Defaults[.fetchInterval], on: .main, in: .common)
+		timer = Timer.publish(every: Double(Defaults[.fetchInterval]), on: .main, in: .common)
 			.autoconnect()
 			.sink { [weak self] _ in
 				self?.refreshData()

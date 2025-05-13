@@ -22,11 +22,13 @@ class SettingsManager {
 		}
 		
 		luminare?.show()
+		NSApp.setActivationPolicy(.regular)
 	}
 	
 	static func fullyClose() {
 		luminare?.close()
 		luminare = nil
+		NSApp.setActivationPolicy(.accessory)
 	}
 }
 
@@ -97,11 +99,38 @@ struct SettingsView: View {
 	}
 }
 
+enum FetchIntervalConfiguration: Int, Defaults.Serializable, CaseIterable, Identifiable {
+	var id: Self { self }
+	
+	case reallyFast = 2
+	case fast = 6
+	case balanced = 15
+	case slow = 30
+	case reallySlow = 60
+	
+	var name: LocalizedStringKey {
+		switch self {
+		case .reallyFast:
+			"Really fast"
+		case .fast:
+			"Fast"
+		case .balanced:
+			"Balanced"
+		case .slow:
+			"Slow"
+		case .reallySlow:
+			"Really slow"
+		}
+	}
+}
+
 struct SettingsTabView: View {
 	@Default(.githubUsername) private var githubUsername
 	@Default(.githubToken) private var githubToken
 	@Default(.fetchInterval) private var fetchInterval
 	@Default(.rollingFetchDays) private var rollingFetchDays
+	
+	private let fetchIntervalOptions = [2, 5, 15, 30, 60, 120]
 	
 	var body: some View {
 		LuminareSection("GitHub details") {
@@ -110,14 +139,20 @@ struct SettingsTabView: View {
 		}
 		
 		LuminareSection("Fetch settings") {
-			LuminareValueAdjuster(
+			LuminareSliderPicker(
 				"Fetch Interval",
-				value: $fetchInterval,
-				sliderRange: 0...30,
-				suffix: "sec",
-				lowerClamp: true,
-				upperClamp: true
+				fetchIntervalOptions,
+				selection: Binding(
+					get: {
+						fetchIntervalOptions.min(by: { abs($0 - fetchInterval) < abs($1 - fetchInterval) }) ?? fetchInterval
+					},
+					set: { fetchInterval = $0 }
+				),
+				label: { value in
+					LocalizedStringKey("\(value) sec")
+				}
 			)
+
 			
 			LuminareValueAdjuster(
 				"Number of days in the past to fetch",
