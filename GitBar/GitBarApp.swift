@@ -20,10 +20,12 @@ struct GitBarApp: App {
 				Button("Open settings") {
 					SettingsManager.open()
 				}
+				.keyboardShortcut(",", modifiers: .command)
 				
 				Button("Quit GitBar") {
 					NSApplication.shared.terminate(nil)
 				}
+				.keyboardShortcut("q", modifiers: .command)
 			}
 			.padding(.vertical, 5)
 		} label: {

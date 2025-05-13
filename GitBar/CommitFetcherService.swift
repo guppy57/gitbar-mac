@@ -15,18 +15,29 @@ class CommitFetcherService: ObservableObject {
 	
 	private var timer: AnyCancellable?
 	private var isRunning = false
+	private var defaultsObserver: AnyCancellable?
 	
 	init() {
 		self.commitFetcher = CommitFetcher()
 		self.refreshData()
+		
+		// Observe changes to fetchInterval default
+		defaultsObserver = Defaults.publisher(.fetchInterval)
+			.sink { [weak self] newValue in
+				// Restart timer with new interval if running
+				if self?.isRunning == true {
+					self?.stopMonitoring()
+					self?.startMonitoring()
+				}
+			}
 	}
 	
-	func startMonitoring(interval: TimeInterval = Defaults[.fetchInterval]) {
+	func startMonitoring() {
 		if isRunning { return }
 		
 		refreshData()
 		
-		timer = Timer.publish(every: interval, on: .main, in: .common)
+		timer = Timer.publish(every: Defaults[.fetchInterval], on: .main, in: .common)
 			.autoconnect()
 			.sink { [weak self] _ in
 				self?.refreshData()
@@ -42,6 +53,7 @@ class CommitFetcherService: ObservableObject {
 	}
 	
 	private func refreshData() {
+		print("Refreshing data..... \(Defaults[.fetchInterval]) secs")
 		commitFetcher.fetchCommits()
 		lastRefreshTime = Date()
 	}

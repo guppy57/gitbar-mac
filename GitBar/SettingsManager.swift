@@ -22,18 +22,11 @@ class SettingsManager {
 		}
 		
 		luminare?.show()
-		
-		// AppDelegate.isActive = true
-		// NSApp.setActivationPolicy(.regular)
 	}
 	
 	static func fullyClose() {
 		luminare?.close()
 		luminare = nil
-		
-		// if !Defaults[.showDockIcon] {
-		//	 NSApp.setActivationPolicy(.accessory)
-		// }
 	}
 }
 
@@ -106,10 +99,34 @@ struct SettingsView: View {
 
 struct SettingsTabView: View {
 	@Default(.githubUsername) private var githubUsername
+	@Default(.githubToken) private var githubToken
+	@Default(.fetchInterval) private var fetchInterval
+	@Default(.rollingFetchDays) private var rollingFetchDays
 	
 	var body: some View {
-		LuminareSection("GitHub username") {
+		LuminareSection("GitHub details") {
 			LuminareTextField("GitHub Username", text: Binding(get: { githubUsername }, set: { githubUsername = $0}))
+			LuminareTextField("GitHub Token", text: Binding(get: { githubToken }, set: { githubToken = $0}))
+		}
+		
+		LuminareSection("Fetch settings") {
+			LuminareValueAdjuster(
+				"Fetch Interval",
+				value: $fetchInterval,
+				sliderRange: 0...30,
+				suffix: "sec",
+				lowerClamp: true,
+				upperClamp: true
+			)
+			
+			LuminareValueAdjuster(
+				"Number of days in the past to fetch",
+				value: $rollingFetchDays,
+				sliderRange: 0...365,
+				suffix: "days",
+				lowerClamp: true,
+				upperClamp: true
+			)
 		}
 	}
 }
