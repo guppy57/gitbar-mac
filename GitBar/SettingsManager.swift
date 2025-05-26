@@ -51,8 +51,8 @@ enum Tab: LuminareTabItem, CaseIterable {
 	
 	var icon: Image {
 		switch self {
-		case .settingsTab: Image(systemName: "star.fill")
-		case .aboutTab: Image(systemName: "star")
+		case .settingsTab: Image(systemName: "gearshape")
+		case .aboutTab: Image(systemName: "info.circle")
 		}
 	}
 	
@@ -79,7 +79,7 @@ struct SettingsView: View {
 	var body: some View {
 		LuminareDividedStack {
 			LuminareSidebar {
-				LuminareSidebarSection("GitBar for Macintosh", selection: $model.currentTab, items: [Tab.settingsTab, Tab.aboutTab])
+				LuminareSidebarSection("GitBar for Mac", selection: $model.currentTab, items: [Tab.settingsTab, Tab.aboutTab])
 			}
 			.frame(width: 240)
 			
@@ -167,7 +167,57 @@ struct SettingsTabView: View {
 }
 
 struct AboutTabView: View {
+	@Environment(\.openURL) var openURL
+	@State private var hover: Bool = false
+	
 	var body: some View {
-		Text("About")
+		LuminareSection {
+			Text(
+				"Checkout the GitBar website for new updates and if you have any feedback or find any bugs with GitBar, please let us know on GitHub. Your feedback is absolutely vital!"
+			)
+			.padding(8)
+
+			HStack(spacing: 2) {
+				Button("Viit Website") {
+					openURL(URL(string: "https://gitbar.guppy57.com")!)
+				}
+				
+				Button("Send Feedback") {
+					openURL(URL(string: "https://github.com/guppy57/gitbar-mac")!)
+				}
+			}
+		}
+		
+		LuminareSection("Credits") {
+			Text("""
+			Developer:
+				Armaan Gupta - https://guppy57.com
+
+			Special Thanks:
+				GitHub API Team
+				SwiftUI Community
+
+			Third-Party Libraries:
+				[Defaults - Sindre Sorhus](https://github.com/sindresorhus/Defaults)
+				[Luminare - Kai](https://github.com/MrKai77/Luminare)
+
+			Icons:
+				SF Symbols by Apple
+			""")
+				.frame(maxWidth: .infinity, alignment: .leading)
+				.padding(8)
+				.onHover { isHovered in
+					self.hover = isHovered
+					DispatchQueue.main.async {
+						if (self.hover) {
+							NSCursor.pointingHand.push()
+						} else {
+							NSCursor.pop()
+						}
+					}
+				}
+		}
+		
+		
 	}
 }
