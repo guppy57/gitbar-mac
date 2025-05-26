@@ -17,6 +17,20 @@ struct GitBarApp: App {
 			VStack {
 				ContentView()
 					.environmentObject(commitFetcherService)
+				
+				Button("View project on GitHub") {
+					if let url = URL(string: "https://github.com/guppy57/gitbar-mac") {
+						NSWorkspace.shared.open(url)
+					}
+				}
+				
+				Button("Have an issue? Get support here") {
+					if let url = URL(string: "https://gitbar.guppy57.com/support") {
+						NSWorkspace.shared.open(url)
+					}
+				}
+				
+				Divider()
 			
 				Button("Open settings") {
 					SettingsManager.open()
