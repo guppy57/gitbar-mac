@@ -33,11 +33,11 @@ struct ContributionCalendar: Codable {
 }
 
 class CommitFetcher: ObservableObject {
-	@Published var commitCount: Int = 0
+	@Published var commitCount: Int
 	@Published var isLoading: Bool = false
 	
-	enum CommitFetcherError: Error {
-		case networkError
+	init() {
+		self.commitCount = Defaults[.lastCommitCount]
 	}
 	
 	private func parseGitHubRespose(jsonString: String) -> Int? {
@@ -56,11 +56,30 @@ class CommitFetcher: ObservableObject {
 		}
 	}
 	
-	func fetchCommits() {
+	enum FetchCommitsError: Error {
+		case invalidUrl
+		case networkError
+		case responseFailed
+		case encodingError
+	}
+	
+	var githubToken: String {
+		Defaults[.githubToken]
+	}
+	
+	var githubUsername: String {
+		Defaults[.githubUsername]
+	}
+	
+	var rollingFetchDays: Double {
+		Defaults[.rollingFetchDays]
+	}
+	
+	func fetchCommits() throws -> Int {
 		self.isLoading = true
 		
 		let fromDate: Date = {
-			return Calendar.current.date(byAdding: .day, value: -1 * Int(Defaults[.rollingFetchDays]), to: Date()) ?? Date()
+			return Calendar.current.date(byAdding: .day, value: -1 * Int(rollingFetchDays), to: Date()) ?? Date()
 		}()
 		let fromISO = ISO8601DateFormatter().string(from: fromDate)
 		let toISO = ISO8601DateFormatter().string(from: Date())
@@ -68,17 +87,17 @@ class CommitFetcher: ObservableObject {
 		guard let url = URL(string: "https://api.github.com/graphql") else {
 			print("api.github.com/graphql is invalid for some reason")
 			self.isLoading = false
-			return
+			throw FetchCommitsError.invalidUrl
 		}
 		
 		var request = URLRequest(url: url)
 		request.httpMethod = "POST"
 		request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-		request.addValue("bearer \(Defaults[.githubToken])", forHTTPHeaderField: "Authorization")
+		request.addValue("bearer \(githubToken)", forHTTPHeaderField: "Authorization")
 
 		let queryWithParams = """
 			query {
-				user(login: "\(Defaults[.githubUsername])") {
+				user(login: "\(githubUsername)") {
 				contributionsCollection(from: "\(fromISO)", to: "\(toISO)") {
 				  contributionCalendar {
 				    totalContributions
@@ -87,8 +106,6 @@ class CommitFetcher: ObservableObject {
 			  }
 			}
 		"""
-		
-		print(queryWithParams)
 		
 		do {
 			let body = GraphQLPayload(query: queryWithParams)
@@ -121,17 +138,19 @@ class CommitFetcher: ObservableObject {
 							} else {
 								self.commitCount = parsedTotalCommits ?? 0
 							}
-							
 						}
 					}
 					
-					self.isLoading = false
+					
 				}
 			}.resume()
 		} catch {
 			print("Error encoding request: \(error)")
 			self.isLoading = false
+			throw FetchCommitsError.encodingError
 		}
+		
+		return self.commitCount
 	}
 }
 

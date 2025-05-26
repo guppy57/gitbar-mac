@@ -54,7 +54,13 @@ class CommitFetcherService: ObservableObject {
 	
 	private func refreshData() {
 		print("Refreshing data..... \(Defaults[.fetchInterval]) secs")
-		commitFetcher.fetchCommits()
+		
+		let commitCount = try? commitFetcher.fetchCommits()
+		
+		if let commitCount = commitCount {
+			Defaults[.lastCommitCount] = commitCount
+		}
+		
 		lastRefreshTime = Date()
 	}
 }
