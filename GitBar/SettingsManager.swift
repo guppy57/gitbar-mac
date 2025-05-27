@@ -9,6 +9,7 @@ import Combine
 import Luminare
 import SwiftUI
 import Defaults
+import LaunchAtLogin
 
 class SettingsManager {
 	static var luminare: LuminareWindow?
@@ -40,11 +41,13 @@ enum Tab: LuminareTabItem, CaseIterable {
 	var id: String { title }
 	
 	case settingsTab
+	case appearenceTab
 	case aboutTab
 	
 	var title: String {
 		switch self {
 		case .settingsTab: .init(localized: "Settings tab: Settings", defaultValue: "Settings")
+		case .appearenceTab: .init(localized: "Settings Tab: Appearence", defaultValue: "Appearence")
 		case .aboutTab: .init(localized: "Settings tab: About", defaultValue: "About")
 		}
 	}
@@ -52,6 +55,7 @@ enum Tab: LuminareTabItem, CaseIterable {
 	var icon: Image {
 		switch self {
 		case .settingsTab: Image(systemName: "gearshape")
+		case .appearenceTab: Image(systemName: "paintpalette")
 		case .aboutTab: Image(systemName: "info.circle")
 		}
 	}
@@ -59,7 +63,52 @@ enum Tab: LuminareTabItem, CaseIterable {
 	@ViewBuilder func view() -> some View {
 		switch self {
 		case .settingsTab: SettingsTabView()
+		case .appearenceTab: AppearenceTabView()
 		case .aboutTab: AboutTabView()
+		}
+	}
+}
+
+public enum CustomIcon: String, CaseIterable {
+	var id: String { fileName }
+	
+	case github = "github"
+	case githubSquare = "githubSquare"
+	case githubAlt = "githubAlt"
+	case git = "git"
+	case codeBranch = "codeBranch"
+	case codeCommit = "codeCommit"
+	
+	var fileName: String {
+		switch self {
+		case .github: "github-18px"
+		case .githubSquare: "github-square-18px"
+		case .githubAlt: "github-alt-18px"
+		case .git: "git-18px"
+		case .codeBranch: "code-branch-18px"
+		case .codeCommit: "code-commit-18px"
+		}
+	}
+	
+	var fileNameWhite: String {
+		switch self {
+		case .github: "github-18px-w"
+		case .githubSquare: "github-square-18px-w"
+		case .githubAlt: "github-alt-18px-w"
+		case .git: "git-18px-w"
+		case .codeBranch: "code-branch-18px-w"
+		case .codeCommit: "code-commit-18px-w"
+		}
+	}
+	
+	var displayName: String {
+		switch self {
+		case .github: "GitHub Octocat"
+		case .githubSquare: "GitHub Octocat Square"
+		case .githubAlt: "GitHub Octocat Alt"
+		case .git: "Git"
+		case .codeBranch: "Code Branch"
+		case .codeCommit: "Code Commit"
 		}
 	}
 }
@@ -79,9 +128,9 @@ struct SettingsView: View {
 	var body: some View {
 		LuminareDividedStack {
 			LuminareSidebar {
-				LuminareSidebarSection("GitBar for Mac", selection: $model.currentTab, items: [Tab.settingsTab, Tab.aboutTab])
+				LuminareSidebarSection("GitBar for Mac", selection: $model.currentTab, items: [Tab.settingsTab, Tab.appearenceTab, Tab.aboutTab])
 			}
-			.frame(width: 240)
+			.frame(width: 220)
 			
 			LuminarePane {
 				HStack {
@@ -94,7 +143,7 @@ struct SettingsView: View {
 				model.currentTab.view()
 					.transition(.opacity.animation(.easeInOut(duration: 0.15)))
 			}
-			.frame(width: 400)
+			.frame(width: 420)
 		}
 	}
 }
@@ -152,7 +201,6 @@ struct SettingsTabView: View {
 					LocalizedStringKey("\(value) sec")
 				}
 			)
-
 			
 			LuminareValueAdjuster(
 				"Number of days in the past to fetch",
@@ -162,6 +210,56 @@ struct SettingsTabView: View {
 				lowerClamp: true,
 				upperClamp: true
 			)
+		}
+		
+		LuminareSection {
+			LuminareToggle("Launch at login", isOn: Binding(
+				get: { LaunchAtLogin.isEnabled },
+				set: { newValue in
+					LaunchAtLogin.isEnabled = newValue
+				}
+			))
+		}
+	}
+}
+
+struct AppearenceTabView: View {
+	@Environment(\.colorScheme) var colorScheme
+	@Default(.showIcon) private var showIcon
+	@Default(.customIconString) private var customIconString
+	
+	var body: some View {
+		LuminareSection("Icon") {
+			Menu {
+				ForEach(CustomIcon.allCases, id: \.self) { icon in
+					Button(action: { customIconString = icon.rawValue }) {
+						Label {
+							Text(icon.displayName)
+						} icon: {
+							Image(colorScheme == .dark ? icon.fileNameWhite : icon.fileName)
+						}
+					}
+				}
+			} label: {
+				HStack {
+					if let currentIcon = CustomIcon(rawValue: customIconString) {
+						Image(colorScheme == .dark ? currentIcon.fileNameWhite : currentIcon.fileName)
+						Text("  \(currentIcon.displayName)")
+					} else {
+						Image(colorScheme == .dark ? CustomIcon.github.fileNameWhite : CustomIcon.github.fileName)
+						Text("  \(CustomIcon.github.displayName)")
+					}
+					Spacer()
+					Image(systemName: "chevron.up.chevron.down")
+				}
+				.frame(maxWidth: .infinity)
+				.cornerRadius(6)
+				.padding(.bottom, 4)
+			}
+			.menuStyle(.borderlessButton)
+			.padding(8)
+			
+			LuminareToggle("Show icon in menu bar", isOn: $showIcon)
 		}
 	}
 }
@@ -178,7 +276,7 @@ struct AboutTabView: View {
 			.padding(8)
 
 			HStack(spacing: 2) {
-				Button("Viit Website") {
+				Button("Visit Website") {
 					openURL(URL(string: "https://gitbar.guppy57.com")!)
 				}
 				
@@ -199,6 +297,7 @@ struct AboutTabView: View {
 
 			Third-Party Libraries:
 				[Defaults - Sindre Sorhus](https://github.com/sindresorhus/Defaults)
+				[LaunchAtLogin-Modern - Sindre Sorhus](https://github.com/sindresorhus/LaunchAtLogin-Modern)
 				[Luminare - Kai](https://github.com/MrKai77/Luminare)
 
 			Icons:
@@ -217,7 +316,5 @@ struct AboutTabView: View {
 					}
 				}
 		}
-		
-		
 	}
 }

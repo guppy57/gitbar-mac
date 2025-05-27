@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Defaults
 
 @main
 struct GitBarApp: App {
@@ -42,7 +43,6 @@ struct GitBarApp: App {
 				}
 				.keyboardShortcut("q", modifiers: .command)
 			}
-			.padding(.vertical, 5)
 		} label: {
 			MenuBarLabel(commitCount: commitFetcherService.commitFetcher.commitCount)
 				.environmentObject(commitFetcherService)
@@ -54,13 +54,23 @@ struct GitBarApp: App {
 }
 
 struct MenuBarLabel: View {
+	@Default(.showIcon) private var showIcon
+	@Default(.customIconString) private var customIconString
 	var commitCount: Int
 	
+	private var icon: CustomIcon {
+		CustomIcon(rawValue: customIconString) ?? .github
+	}
+	
 	var body: some View {
-		HStack(spacing: 4) {
-			Text("\(commitCount)")
+		HStack {
+			Text(" \(commitCount)")
 				.monospacedDigit()
-			Image(systemName: "swift")
+			if (showIcon) {
+				Image(icon.fileNameWhite)
+					.resizable()
+					.renderingMode(.template)
+			}
 		}
 	}
 }

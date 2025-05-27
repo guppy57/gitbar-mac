@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8D02E78B2DE5071C00E77385 /* LaunchAtLogin in Frameworks */ = {isa = PBXBuildFile; productRef = 8D02E78A2DE5071C00E77385 /* LaunchAtLogin */; };
 		8D8E1DB92DCB961000747837 /* Luminare in Frameworks */ = {isa = PBXBuildFile; productRef = 8D8E1DB82DCB961000747837 /* Luminare */; };
 		8D8E1DBE2DCB9D6700747837 /* Defaults in Frameworks */ = {isa = PBXBuildFile; productRef = 8D8E1DBD2DCB9D6700747837 /* Defaults */; };
 		8D8E1DC02DCB9D6700747837 /* DefaultsMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 8D8E1DBF2DCB9D6700747837 /* DefaultsMacros */; };
@@ -73,6 +74,7 @@
 			files = (
 				8D8E1DC02DCB9D6700747837 /* DefaultsMacros in Frameworks */,
 				8D8E1DBE2DCB9D6700747837 /* Defaults in Frameworks */,
+				8D02E78B2DE5071C00E77385 /* LaunchAtLogin in Frameworks */,
 				8D8E1DB92DCB961000747837 /* Luminare in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -137,6 +139,7 @@
 				8D8E1DB82DCB961000747837 /* Luminare */,
 				8D8E1DBD2DCB9D6700747837 /* Defaults */,
 				8D8E1DBF2DCB9D6700747837 /* DefaultsMacros */,
+				8D02E78A2DE5071C00E77385 /* LaunchAtLogin */,
 			);
 			productName = GitBar;
 			productReference = 8DE92B1E2DCAFE05002301A7 /* GitBar.app */;
@@ -223,6 +226,7 @@
 			packageReferences = (
 				8D8E1DB72DCB961000747837 /* XCRemoteSwiftPackageReference "Luminare" */,
 				8D8E1DBC2DCB9D6700747837 /* XCRemoteSwiftPackageReference "Defaults" */,
+				8D02E7892DE506A900E77385 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 8DE92B1F2DCAFE05002301A7 /* Products */;
@@ -586,6 +590,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		8D02E7892DE506A900E77385 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/LaunchAtLogin-Modern";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		8D8E1DB72DCB961000747837 /* XCRemoteSwiftPackageReference "Luminare" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/MrKai77/Luminare";
@@ -605,6 +617,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		8D02E78A2DE5071C00E77385 /* LaunchAtLogin */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8D02E7892DE506A900E77385 /* XCRemoteSwiftPackageReference "LaunchAtLogin-Modern" */;
+			productName = LaunchAtLogin;
+		};
 		8D8E1DB82DCB961000747837 /* Luminare */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 8D8E1DB72DCB961000747837 /* XCRemoteSwiftPackageReference "Luminare" */;
