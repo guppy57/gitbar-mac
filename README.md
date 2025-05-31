@@ -12,9 +12,10 @@ Once you download the app, open up the settings by clicking on the Menu Bar item
 Right now, you can adjust the following settings:
 1. Fetch Interval - this is how many seconds you want GitBar to wait for between fetching your total contributions from GitHub
 2. Number of Days in the past to fetch - you can adjust the number of days you want GitBar to get your contribution count for. The maximum is 365 days and the minium is 1 day.
-3. Icon - ...
+3. Icon - under "Settings > Appearance" you can pick a different icon for the menu bar and choose to hide or show it.
 
 ## Have any issues?
+Open an issue on this repo or shoot me an email at [armaan@guppy.im](mailto:armaan@guppy.im)
 
 ## Credits
 Special Thanks:
@@ -27,3 +28,4 @@ Third-Party Libraries:
 
 Icons:
     SF Symbols by Apple
+    FontAwesome
