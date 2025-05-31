@@ -302,6 +302,7 @@ struct AboutTabView: View {
 
 			Icons:
 				SF Symbols by Apple
+				FontAwesome
 			""")
 				.frame(maxWidth: .infinity, alignment: .leading)
 				.padding(8)
