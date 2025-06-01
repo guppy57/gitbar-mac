@@ -113,6 +113,24 @@ public enum CustomIcon: String, CaseIterable {
 	}
 }
 
+public enum FixedFetchOptions: String, CaseIterable {
+	case day = "today"
+	case week = "this_week"
+	case month = "this_month"
+	case quarter = "this_quarter"
+	case year = "this_year"
+	
+	var displayName: String {
+		switch self {
+		case .day: "Today"
+		case .week: "this Week"
+		case .month: "this Month"
+		case .quarter: "this Quarter"
+		case .year: "this Year"
+		}
+	}
+}
+
 class LuminareWindowModel: ObservableObject {
 	static let shared = LuminareWindowModel()
 	private init() {
@@ -178,6 +196,8 @@ struct SettingsTabView: View {
 	@Default(.githubToken) private var githubToken
 	@Default(.fetchInterval) private var fetchInterval
 	@Default(.rollingFetchDays) private var rollingFetchDays
+	@Default(.fixedFetchOption) private var fixedFetchOption
+	@Default(.useRollingCount) private var useRollingCount
 	
 	private let fetchIntervalOptions = [2, 5, 15, 30, 60, 120]
 	
@@ -202,14 +222,45 @@ struct SettingsTabView: View {
 				}
 			)
 			
+			Menu {
+				ForEach(FixedFetchOptions.allCases, id: \.self) { interval in
+					Button(action: { fixedFetchOption = interval.rawValue }) {
+						Text(interval.displayName)
+					}
+				}
+			} label: {
+				HStack {
+					if let currentFetchOption = FixedFetchOptions(rawValue: fixedFetchOption) {
+						Text("Fetch contributions for \(currentFetchOption.displayName)")
+					} else {
+						Text("Fetch contributions for \(FixedFetchOptions.week.displayName)")
+					}
+					Spacer()
+				}
+				.frame(maxWidth: .infinity)
+				.cornerRadius(6)
+				.padding(.bottom, 4)
+			}
+			.menuStyle(.borderlessButton)
+			.padding(6)
+			
+			LuminareToggle("Use rolling days instead of a fixed interval?", isOn: Binding(
+				get: { useRollingCount },
+				set: {
+					newValue in
+					useRollingCount = newValue
+				}
+			))
+			
 			LuminareValueAdjuster(
-				"Number of days in the past to fetch",
+				"Number of rolling days in the past to fetch",
 				value: $rollingFetchDays,
 				sliderRange: 0...365,
 				suffix: "days",
 				lowerClamp: true,
-				upperClamp: true
+				upperClamp: true,
 			)
+			.disabled(!useRollingCount)
 		}
 		
 		LuminareSection {
