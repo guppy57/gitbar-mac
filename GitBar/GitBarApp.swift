@@ -19,6 +19,8 @@ struct GitBarApp: App {
 				ContentView()
 					.environmentObject(commitFetcherService)
 				
+				Divider()
+				
 				Button("View project on GitHub") {
 					if let url = URL(string: "https://github.com/guppy57/gitbar-mac") {
 						NSWorkspace.shared.open(url)
