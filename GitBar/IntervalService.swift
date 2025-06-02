@@ -15,8 +15,8 @@ class IntervalService {
 			return Calendar.current.date(byAdding: .day, value: -1 * Int(rollingDays), to: Date()) ?? Date()
 		}()
 		
-		var fromISO = isoFormatter.string(from: fromDate)
-		var toISO = isoFormatter.string(from: Date())
+		let fromISO = isoFormatter.string(from: fromDate)
+		let toISO = isoFormatter.string(from: Date())
 		
 		return (from: fromISO, to: toISO)
 	}

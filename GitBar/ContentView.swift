@@ -16,7 +16,6 @@ struct ContentView: View {
 	private let intervalService = IntervalService()
 	
 	func getIntervalText() -> String {
-		var text = ""
 		var isos: (from: String, to: String) = (from: "", to: "")
 		
 		if (useRollingCount) {
