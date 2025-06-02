@@ -16,6 +16,7 @@ class CommitFetcherService: ObservableObject {
 	private var timer: AnyCancellable?
 	private var isRunning = false
 	private var defaultsObserver: AnyCancellable?
+	private var fixedFetchOptionObserver: AnyCancellable?
 	
 	init() {
 		self.commitFetcher = CommitFetcher()
@@ -30,6 +31,17 @@ class CommitFetcherService: ObservableObject {
 					self?.startMonitoring()
 				}
 			}
+		
+		fixedFetchOptionObserver = Defaults.publisher(.fixedFetchOption)
+			.sink { [weak self] newValue in
+				self?.refreshData()
+			}
+	}
+	
+	deinit {
+		timer?.cancel()
+		defaultsObserver?.cancel()
+		fixedFetchOptionObserver?.cancel()
 	}
 	
 	func startMonitoring() {
